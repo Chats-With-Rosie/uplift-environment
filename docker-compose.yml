@@ -1,29 +1,9 @@
 version: '3.8'
 
 services:
-  frontend:
-    build:
-      context: ../rosie-front-end/Frontend
-    image: rosie_front_end:latest
-    env_file: .env
-    ports:
-      - "5069:5069"
-
-  listen_service:
-    build:
-      context: ../rosie-listen/server/service
-    image: listening_image:latest
-    ports:
-      - "5030:5020"
-    devices:
-      - /dev/snd:/dev/snd
-      - /dev:/dev
-      - /dev/dsp:/dev/dsp
-      - /dev/sequencer:/dev/sequencer
-
   speak_service:
     build: ../rosie-speaks/server/service
-    image: speak_service_image:latest
+    image: speak_service_image:01
     ports:
       - "5050:5050"
     env_file:
@@ -32,14 +12,32 @@ services:
   think_service:
     build:
       context: ../rosie-thinks/server/service
-    image: think_service_image:latest
+    image: think_service_image:01
     env_file: .env
     ports:
       - "5080:5080"
     devices:
-      - /dev/snd:/dev/snd
       - /dev:/dev
-      - /dev/dsp:/dev/dsp
-      - /dev/sequencer:/dev/sequencer
+    depends_on:
+      - speak_service
 
+  frontend:
+    build:
+      context: ../rosie-front-end/Frontend
+    image: rosie_front_end:01
+    env_file: .env
+    ports:
+      - "5069:5069"
+    depends_on:
+      - think_service
 
+  listen_service:
+    build:
+      context: ../rosie-listen/server/service
+    image: listening_image:01
+    ports:
+      - "5030:5030"
+    devices:
+      - /dev:/dev
+    depends_on:
+      - frontend
