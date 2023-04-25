@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ../rosie-front-end/Frontend
+    image: rosie_front_end:latest
+    env_file: .env
+    ports:
+      - "5069:5069"
+
+  listen_service:
+    build:
+      context: ../rosie-listen/server/service
+    image: listening_image:latest
+    ports:
+      - "5030:5020"
+
+  speak_service:
+    build: ../rosie-speaks/server/service
+    image: speak_service_image:latest
+    ports:
+      - "5050:5050"
+    env_file:
+      - .env
+
+  think_service:
+    build:
+      context: ../rosie-thinks/server/service
+    image: think_service_image:latest
+    env_file: .env
+    ports:
+      - "5080:5080"
+
+
