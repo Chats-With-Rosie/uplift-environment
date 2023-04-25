@@ -15,6 +15,11 @@ services:
     image: listening_image:latest
     ports:
       - "5030:5020"
+    devices:
+      - /dev/snd:/dev/snd
+      - /dev:/dev
+      - /dev/dsp:/dev/dsp
+      - /dev/sequencer:/dev/sequencer
 
   speak_service:
     build: ../rosie-speaks/server/service
@@ -31,5 +36,10 @@ services:
     env_file: .env
     ports:
       - "5080:5080"
+    devices:
+      - /dev/snd:/dev/snd
+      - /dev:/dev
+      - /dev/dsp:/dev/dsp
+      - /dev/sequencer:/dev/sequencer
 
 
