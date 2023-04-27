@@ -1,43 +1,36 @@
 version: '3.8'
 
 services:
-  speak_service:
-    build: ../rosie-speaks/server/service
-    image: speak_service_image:01
+  frontend:
+    image: ca9f9ab96d5a
     ports:
-      - "5050:5050"
-    env_file:
-      - .env
+      - "5000:5000"
+    environment:
+    - FRONT_END_IMAGE_UPLOAD=http://frontend:5000/upload-image
+    - SPEAK_SERVICE=http://frontend:5000/rosie-speak
+    - THINK_SERVICE=http://think_service:5080/think
+    - THINK_SERVICE_UPLOAD_CONTEXT=http://think_service:5080/upload-context
+    - OPENAI_API_KEY=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
 
   think_service:
-    build:
-      context: ../rosie-thinks/server/service
-    image: think_service_image:01
+    image: 16d7bed2d81b
     env_file: .env
     ports:
       - "5080:5080"
     devices:
       - /dev:/dev
-    depends_on:
-      - speak_service
-
-  frontend:
-    build:
-      context: ../rosie-front-end/Frontend
-    image: rosie_front_end:01
-    env_file: .env
-    ports:
-      - "5069:5069"
-    depends_on:
-      - think_service
-
-  listen_service:
-    build:
-      context: ../rosie-listen/server/service
-    image: listening_image:01
-    ports:
-      - "5030:5030"
-    devices:
-      - /dev:/dev
+    environment:
+      - FRONT_END_IMAGE_UPLOAD=http://frontend:5000/upload-image
+      - SPEAK_SERVICE=http://frontend:5000/rosie-speak
+      - THINK_SERVICE=http://think_service:5080/think
+      - THINK_SERVICE_UPLOAD_CONTEXT=http://think_service:5080/upload-context
+      - OPENAI_API_KEY=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
+    command: 
+      - /bin/sh
+      - -c
+      - |
+        #!/bin/sh
+        sleep 50
+        exec python3 /app/thinking.py
     depends_on:
       - frontend
